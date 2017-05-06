@@ -16,7 +16,7 @@ def split(df, test_start_string = '2016-12-01', date_fmt = '%Y-%m-%d'):
     return: train, test
     '''
     test_start = dt.datetime.strptime(test_start_string,date_fmt).date()
-    train_end = test_start - dt.timedelta(days = 1)
+    train_end = test_start - dt.timedelta(days=1)
     train_end_string = train_end.strftime(date_fmt)
     train = df.ix[:train_end_string]
     test = df.ix[test_start_string:]
@@ -28,16 +28,21 @@ def load(filename, parse_dates = ['TIMESTAMP_UTC'], index_col = 'TIMESTAMP_UTC')
     return pd.read_csv(filename, parse_dates = parse_dates, index_col = index_col)
 
 ## split into XY lists
-def XYsplit(df, X_column = 'HEADLINE', Y_column = 'CSS_score'):
+def XYsplit(df, X_column = 'HEADLINE', Y_column = 'CSS_score', remove_duplicates = False):
+    if remove_duplicates:
+        df = df.drop_duplicates()
     X = df[X_column]
     Y = df[Y_column]
     return X.tolist(), Y.tolist()
 
 if __name__ == "__main__":
     filename = "2016_clean.csv"
-    filepath = "./appended/"
+    filepath = "./data/appended/"
     df = load(filepath+filename)
     df = create_column(df)
     train, test = split(df)
     X_train, Y_train = XYsplit(train)
-    X_test, Y_test = XYsplit(test)
+    print len(X_train)
+    X_train_drop, Y_train_drop = XYsplit(train, remove_duplicates = True)
+    print len(X_train_drop)
+    #X_test, Y_test = XYsplit(test)
